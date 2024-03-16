@@ -26,9 +26,9 @@ class SnakeViewer:
 		"""
 		self.top.minsize(width=width, height=height)
 		self.top.title(title)
-		self.canvas = tkinter.Canvas(self.top, width=width + 1, height=height + 1, bg='white')
+		self.canvas = tkinter.Canvas(self.top, width=width + 1, height=height + 1, bg='black')
 		self.canvas.pack(padx=10, pady=10)
-		self.ScoreBoard = self.CreateScoreBoard('green')
+		self.ScoreBoard = self.CreateScoreBoard('white')
 		self.AddMaze(self.state.maze)
 		self.UpdateView()
 
@@ -36,8 +36,8 @@ class SnakeViewer:
 		"""
 		Method to position score_board text on the canvas for each player
 		"""
-		x_offset = 0.05
-		return self.canvas.create_text(x_offset * self.CANVAS_WIDTH, 0.01 * self.CANVAS_HEIGHT, text=('Score : ' + str(0)), anchor=tkinter.NW, font=("Times", 12, 'bold'), fill = color)
+		x_offset = 0.08
+		return self.canvas.create_text(x_offset * self.CANVAS_WIDTH, 0.05 * self.CANVAS_HEIGHT, text=('Score : ' + str(0)), anchor=tkinter.NW, font=("Helvetica", 18, 'bold'), fill=color)
 		
 	def AddSnake(self, snake):
 		x0 = snake.HeadPosition.X*self.UnitSize
@@ -61,12 +61,12 @@ class SnakeViewer:
 		W = x0 + self.UnitSize
 		H = y0 + self.UnitSize
 		self.canvas.delete("food")
-		self.canvas.create_oval(x0, y0, W, H, fill='green', tags='food')
+		self.canvas.create_oval(x0, y0, W, H, fill='yellow', tags='food')
 		
 	def AddMaze(self, maze):
 		Units = st.Const.UNIT_SIZE
-		wallColor = 'red'
-		borderColor = 'black'
+		wallColor = 'black'
+		borderColor = 'green'
 		for i in range(59):
 			for j in range(59):
 				if(maze.MAP[j][i] == -1):

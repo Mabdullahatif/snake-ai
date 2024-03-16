@@ -93,7 +93,9 @@ def runGameAgents(agents: tuple):
 if __name__ == '__main__':
     runGameAgents(agents=(
         deployAgent(state=ST.SnakeState('red', 10, 10, 0, 1, "Maze.txt"),
-                    instance=AS.AgentSnake(), windowTitle='Agent 1'),
-        # deployAgent(state=ST.SnakeState('blue', 10, 10, 0, 1, "Maze.txt"),
-        #             instance=AS.AgentSnake(), windowTitle='Agent 2'),
+                    instance=AS.AgentSnake(), windowTitle='Red Wala'),
+        # deployAgent(state=ST.SnakeState('blue', 10, 10, 0, 1, "Maze0.txt"),
+        #             instance=AS.AgentSnake(), windowTitle='Blue Wala'),
+        # deployAgent(state=ST.SnakeState('orange', 10, 10, 0, 1, "Maze.txt"),
+        #             instance=AS.AgentSnake(), windowTitle='Orange Wala'),
     ))
