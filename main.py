@@ -70,32 +70,38 @@ def deployAgent(state, instance, windowTitle):
 
 
 def runGameAgents(agents: tuple):
-	root = tkinter.Tk()
-	root.title('Snake Search with Multiple Agents')
-	root.withdraw()  # Hiding the root window
+    root = tkinter.Tk()
+    root.title('Snake Search with Multiple Agents')
+    root.withdraw()  # Hiding the root window
 
-	# Fueling and running each game agent
-	agentEngines = list()
-	for agent in agents:
-		engine = Main(agent['state'], agent['instance'], agent['windowTitle'])
-		engineInstance = engine.Play()
-		agentEngines.append(engineInstance)
+    # Fueling and running each game agent
+    agentEngines = list()
+    for agent in agents:
+        engine = Main(agent['state'], agent['instance'], agent['windowTitle'])
+        engineInstance = engine.Play()
+        agentEngines.append(engineInstance)
 
-	# Running the Main Tkinter Loop
-	root.mainloop()
+    # Running the Main Tkinter Loop
+    root.mainloop()
 
-	# # Waiting for each agent to be done with their game
-	# for agentEngine in agentEngines:
-	# 	agentEngine.join()
-		
-	# root.destroy()
+    # # Waiting for each agent to be done with their game
+    # for agentEngine in agentEngines:
+    # 	agentEngine.join()
+
+    # root.destroy()
+
 
 if __name__ == '__main__':
     runGameAgents(agents=(
-        deployAgent(state=ST.SnakeState('red', 10, 10, 0, 1, "Maze.txt"),
-                    instance=AS.AgentSnake(), windowTitle='Red Wala'),
-        # deployAgent(state=ST.SnakeState('blue', 10, 10, 0, 1, "Maze0.txt"),
-        #             instance=AS.AgentSnake(), windowTitle='Blue Wala'),
-        # deployAgent(state=ST.SnakeState('orange', 10, 10, 0, 1, "Maze.txt"),
-        #             instance=AS.AgentSnake(), windowTitle='Orange Wala'),
+        # A Star Search
+        deployAgent(state=ST.SnakeState('orange', 10, 10, 0, 1, "Maze.txt"),
+                    instance=AS.AStarSearch(), windowTitle='Red Wala'),
+
+        # Greedy Best First Search
+        deployAgent(state=ST.SnakeState('red', 10, 10, 0, 1, "Maze0.txt"),
+                    instance=AS.GreedyBestFirstSearch(), windowTitle='Blue Wala'),
+
+        # Unifrom Cost Search
+        deployAgent(state=ST.SnakeState('pink', 10, 10, 0, 1, "Maze.txt"),
+                    instance=AS.UniformCostSearch(), windowTitle='Orange Wala'),
     ))
