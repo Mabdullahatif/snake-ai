@@ -43,14 +43,25 @@ class Main:
         while (self.State.snake.isAlive and PlanIsGood):
             ScoreBefore = self.State.snake.score
 
-            Plan = self.AgentSnake.SearchSolution(self.State)
-            self.ExecutePlan(Plan)
+            # Check if the food is at the same place where the snake is
+            # Agent won't have and need a plan if food is already with the snake
+            r = self.State.snake.HeadPosition.Y
+            c = self.State.snake.HeadPosition.X
+            if c == self.State.FoodPosition.X and r == self.State.FoodPosition.Y:
+                self.State.snake.score += 10
+                time.sleep(1/self.View.SPEED)
+                self.View.UpdateView()
+            else:
+                Plan = self.AgentSnake.SearchSolution(self.State)
+                self.ExecutePlan(Plan)
 
             ScoreAfter = self.State.snake.score
 
             if (ScoreAfter == ScoreBefore):
                 PlanIsGood = False
+
             self.State.generateFood()
+
             # time.sleep(1/2)
 
         if (self.State.snake.isAlive):
@@ -95,13 +106,13 @@ if __name__ == '__main__':
     runGameAgents(agents=(
         # A Star Search
         deployAgent(state=ST.SnakeState('orange', 10, 10, 0, 1, "Maze.txt"),
-                    instance=AS.AStarSearch(), windowTitle='Red Wala'),
+                    instance=AS.AStarSearch(), windowTitle='A* Search'),
 
-        # Greedy Best First Search
-        deployAgent(state=ST.SnakeState('red', 10, 10, 0, 1, "Maze0.txt"),
-                    instance=AS.GreedyBestFirstSearch(), windowTitle='Blue Wala'),
+        # # Greedy Best First Search
+        # deployAgent(state=ST.SnakeState('red', 10, 10, 0, 1, "Maze0.txt"),
+        #             instance=AS.GreedyBestFirstSearch(), windowTitle='Blue Wala'),
 
-        # Unifrom Cost Search
-        deployAgent(state=ST.SnakeState('pink', 10, 10, 0, 1, "Maze.txt"),
-                    instance=AS.UniformCostSearch(), windowTitle='Orange Wala'),
+        # # Unifrom Cost Search
+        # deployAgent(state=ST.SnakeState('pink', 10, 10, 0, 1, "Maze.txt"),
+        #             instance=AS.UniformCostSearch(), windowTitle='Orange Wala'),
     ))
