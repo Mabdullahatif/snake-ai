@@ -1,5 +1,7 @@
 import State as ST
 from heapdict import heapdict
+from State import Vector
+import heapq
 
 
 class Agent(object):
@@ -160,10 +162,31 @@ class AStarSearch(Agent):
 
 
 class GreedyBestFirstSearch(Agent):
-    def SearchSolution(self, state):
-        # Implement Your Algo Here
-        pass
+    def SearchSolution(self, state: ST.SnakeState):
+        source = state.snake.HeadPosition.getTuple()
+        goal = state.FoodPosition.getTuple()
 
+        plan = []
+        visited = set()
+        queue = [(abs(source[0] - goal[0]) + abs(source[1] - goal[1]), source, plan)]  # Heuristic + Node + Plan
+        previousMove = self.GetPreviousMove(state)
+
+        while queue:
+            _, node, currentPlan = heapq.heappop(queue)
+            visited.add(node)
+
+            if node[0] == goal[0] and node[1] == goal[1]:
+                plan = currentPlan
+                break
+
+            Moves = self.GenerateMoves(
+                state, node, visited, previousMove if node == source else -1)
+
+            for move, moveCoordinate in Moves.items():
+                moveHeuristic = abs(moveCoordinate[0] - goal[0]) + abs(moveCoordinate[1] - goal[1])
+                heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*currentPlan, move]))
+
+        return plan
 
 class UniformCostSearch(Agent):
     def SearchSolution(self, state):
