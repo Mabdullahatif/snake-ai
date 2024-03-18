@@ -65,10 +65,10 @@ class SnakeViewer:
 		
 	def AddMaze(self, maze):
 		Units = st.Const.UNIT_SIZE
-		wallColor = 'black'
+		wallColor = 'white'
 		borderColor = 'green'
-		for i in range(59):
-			for j in range(59):
+		for i in range(maze.WIDTH-1):
+			for j in range(maze.HEIGHT-1):
 				if(maze.MAP[j][i] == -1):
 					self.canvas.create_rectangle(i*Units, j*Units, (i+1)*Units, (j+1)*Units, fill=wallColor, tags='wall')
 		WI = 6
