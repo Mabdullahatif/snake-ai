@@ -105,12 +105,12 @@ def runGameAgents(agents: tuple):
 if __name__ == '__main__':
     runGameAgents(agents=(
         # A Star Search
-        deployAgent(state=ST.SnakeState('orange', 10, 10, 0, 1, "testMaze.txt"),
-                    instance=AS.AStarSearch(), windowTitle='A* Search'),
+        # deployAgent(state=ST.SnakeState('orange', 10, 10, 0, 1, "testMaze1.txt"),
+        #             instance=AS.AStarSearch(), windowTitle='A* Search'),
 
-        # # Greedy Best First Search
-        # deployAgent(state=ST.SnakeState('red', 10, 10, 0, 1, "Maze0.txt"),
-        #             instance=AS.GreedyBestFirstSearch(), windowTitle='Blue Wala'),
+        # Greedy Best First Search
+        deployAgent(state=ST.SnakeState('red', 10, 10, 0, 1, "testMaze1.txt"),
+                    instance=AS.GreedyBestFirstSearch(), windowTitle='Blue Wala'),
 
         # # Unifrom Cost Search
         # deployAgent(state=ST.SnakeState('pink', 10, 10, 0, 1, "Maze.txt"),
