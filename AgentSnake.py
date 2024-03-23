@@ -1,3 +1,4 @@
+from collections import deque
 import State as ST
 from heapdict import heapdict
 from State import Vector
@@ -168,7 +169,7 @@ class GreedyBestFirstSearch(Agent):
 
         plan = []
         visited = set()
-        queue = [(abs(source[0] - goal[0]) + abs(source[1] - goal[1]), source, plan)]  # Heuristic + Node + Plan
+        queue = [(self.heuristic(state, source, goal), source, plan)]  # Heuristic + Node + Plan
         previousMove = self.GetPreviousMove(state)
 
         while queue:
@@ -183,10 +184,29 @@ class GreedyBestFirstSearch(Agent):
                 state, node, visited, previousMove if node == source else -1)
 
             for move, moveCoordinate in Moves.items():
-                moveHeuristic = abs(moveCoordinate[0] - goal[0]) + abs(moveCoordinate[1] - goal[1])
+                moveHeuristic = self.heuristic(state, moveCoordinate, goal)
                 heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*currentPlan, move]))
 
         return plan
+
+    def heuristic(self, state, start, goal):
+        maze = state.maze.MAP
+        visited = set()
+        queue = deque([(start, 0)])
+        visited.add(start)
+
+        while queue:
+            node, distance = queue.popleft()
+
+            if node == goal:
+                return distance
+
+            for move, moveCoordinate in self.GenerateMoves(state, node, visited, -1).items():
+                visited.add(moveCoordinate)
+                if maze[moveCoordinate[1]][moveCoordinate[0]] != -1:
+                    queue.append((moveCoordinate, distance + 1))
+
+        return float('inf')
 
 class UniformCostSearch(Agent):
     def SearchSolution(self, state: ST.SnakeState):
