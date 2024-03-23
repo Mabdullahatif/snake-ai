@@ -214,36 +214,37 @@ class GreedyBestFirstSearch(Agent):
         return plan
 
 class UniformCostSearch(Agent):
-    def SearchSolution(self, state):
+    def SearchSolution(self, state: ST.SnakeState):
         source = state.snake.HeadPosition.getTuple()
         goal = state.FoodPosition.getTuple()
 
         plan = []
         visited = set()
-        heap = heapdict()
-        heap[source] = (0, 0, plan)  # TotalCost + SourceCost + Moves
+        cost = {source: 0}
+        queue = [(0, source, plan)]  # Cost + Node + Plan
         previousMove = self.GetPreviousMove(state)
 
-        while heap:
-            node, data = heap.popitem()
-            totalCost, sourceCost, currentPlan = data
+        while queue:
+            currentCost, node, currentPlan = heapq.heappop(queue)
             visited.add(node)
 
             if node[0] == goal[0] and node[1] == goal[1]:
                 plan = currentPlan
                 break
 
+            if currentCost > cost[node]:
+                continue  # Skip if we have already found a cheaper path to this node
+
             Moves = self.GenerateMoves(
                 state, node, visited, previousMove if node == source else -1)
 
             for move, moveCoordinate in Moves.items():
-                moveSourceCost = sourceCost + 1
-                currentMoveCost = moveSourceCost
-                previousMoveCost = heap.get(
-                    moveCoordinate, (float('inf'), None, None))[0]
+                moveCost = 1  # Uniform cost for each move
+                totalCost = cost[node] + moveCost
 
-                if currentMoveCost < previousMoveCost:
-                    heap[moveCoordinate] = (
-                        currentMoveCost, moveSourceCost, [*currentPlan, move])
+                if moveCoordinate not in cost or totalCost < cost[moveCoordinate]:
+                    cost[moveCoordinate] = totalCost
+                    heapq.heappush(queue, (totalCost, moveCoordinate, [*currentPlan, move]))
 
-        return plan if len(plan) != 0 else [0]
+        return plan
+
