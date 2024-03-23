@@ -37,9 +37,6 @@ class Vector:
         self.X = self.X + Vec.X
         self.Y = self.Y + Vec.Y
 
-    def getTuple(self):
-        return (self.X, self.Y)
-
 
 class Maze:
     def __init__(self, PuzzleFileName):
@@ -56,7 +53,7 @@ class Maze:
 class Snake:
     def __init__(self, Color, HeadPositionX=10, HeadPositionY=10, HeadDirectionX=1, HeadDirectionY=0):
         self.Size = 1
-        self.Body = []  # in this implementation the body is empty
+        self.Body = []
         self.Color = Color
         self.HeadPosition = Vector(HeadPositionX, HeadPositionY)
         self.HeadDirection = Vector(HeadDirectionX, HeadDirectionY)
@@ -67,7 +64,19 @@ class Snake:
 
         if (self.isAlive == False):
             return
+        
+        previousHeadPosition = Vector(self.HeadPosition.X, self.HeadPosition.Y)
 
+        # Moving the body
+        for i, _ in enumerate(self.Body):
+            if i == len(self.Body) - 1:
+                # This fragment is right behind the snake
+                self.Body[i] = previousHeadPosition
+            else:
+                # Updating the rest of the body
+                self.Body[i] = self.Body[i + 1]
+
+        # Moving the head
         self.HeadPosition.Add(self.HeadDirection)
 
         r = self.HeadPosition.Y
@@ -80,7 +89,15 @@ class Snake:
             self.isAlive = False
         elif (State.maze.MAP[r][c] == -1):
             self.isAlive = False
-        elif (c == State.FoodPosition.X and r == State.FoodPosition.Y):
+
+        for BodyFragment in self.Body:
+            if BodyFragment.X == c and BodyFragment.Y == r:
+                self.isAlive = False
+                break
+        
+        if (c == State.FoodPosition.X and r == State.FoodPosition.Y):
+            BodyFragment = Vector(self.HeadPosition.X, self.HeadPosition.Y)
+            self.Body.insert(0, BodyFragment)
             self.score = self.score + 10
 
 
