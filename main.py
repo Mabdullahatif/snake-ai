@@ -36,30 +36,31 @@ class Main:
             self.View.UpdateView()
 
     def StartSnake(self):
-        if(self.State.snake.isAlive == False):
+        if (self.State.snake.isAlive == False):
             return
         PlanIsGood = True
         Message = "Game Over"
-        while(self.State.snake.isAlive and PlanIsGood):
+        while (self.State.snake.isAlive and PlanIsGood):
             ScoreBefore = self.State.snake.score
             Plan = self.AgentSnake.SearchSolution(self.State)
             self.ExecutePlan(Plan)
-			
+
             ScoreAfter = self.State.snake.score
-			
-            if(ScoreAfter == ScoreBefore):
+
+            if (ScoreAfter == ScoreBefore):
                 self.View.AddFood(self.State.FoodPosition)
                 PlanIsGood = False
-                
+
             self.State.generateFood()
             if not self.State.snake.isAlive:
                 self.View.AddFood(self.State.FoodPosition)
             # time.sleep(1/2)
 
-        if(self.State.snake.isAlive):
-            Message = Message + "  HAS A BAD PLAN"
+        if (self.State.snake.isAlive):
+            Message = Message + " : Has a Bad Plan"
         else:
-            Message = Message + " HAS HIT A WALL"
+            Message = Message + " : Snake Hit Something"
+
         self.View.ShowGameOverMessage(Message)
 
     def Play(self):
@@ -89,14 +90,14 @@ def runGameAgents(agents: tuple):
 if __name__ == '__main__':
     runGameAgents(agents=(
         # A Star Search
-        #deployAgent(state=ST.SnakeState('orange', 10, 10, 0, 1, "hurdlesMaze.txt"),
-         #           instance=AS.AStarSearch(), windowTitle='A* Search'),
+        deployAgent(state=ST.SnakeState('green', 10, 10, 0, 1, "hurdlesMaze.txt"),
+                    instance=AS.AStarSearch(), windowTitle='A* Search'),
 
         # # Greedy Best First Search
-        #deployAgent(state=ST.SnakeState('red', 10, 10, 0, 1, "hurdlesMaze.txt"),
-         #           instance=AS.GreedyBestFirstSearch(), windowTitle='GBFS Search'),
+        # deployAgent(state=ST.SnakeState('red', 10, 10, 0, 1, "hurdlesMaze.txt"),
+        #           instance=AS.GreedyBestFirstSearch(), windowTitle='GBFS Search'),
 
         # # Unifrom Cost Search
-        deployAgent(state=ST.SnakeState('pink', 10, 10, 0, 1, "hurdlesMaze.txt"),
-                     instance=AS.UniformCostSearch(), windowTitle='UCS Search'),
+        # deployAgent(state=ST.SnakeState('pink', 10, 10, 0, 1, "hurdlesMaze.txt"),
+        #              instance=AS.UniformCostSearch(), windowTitle='UCS Search'),
     ))

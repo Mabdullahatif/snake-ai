@@ -56,15 +56,26 @@ class Agent(object):
 
         return True
 
-    def GetPreviousMove(self, state):
-        if state.snake.HeadDirection.X == 0 and state.snake.HeadDirection.Y == -1:
+    @staticmethod
+    def GetPreviousMove(snake):
+        if snake.HeadDirection.X == 0 and snake.HeadDirection.Y == -1:
             return 0
-        if state.snake.HeadDirection.X == 0 and state.snake.HeadDirection.Y == 1:
+        if snake.HeadDirection.X == 0 and snake.HeadDirection.Y == 1:
             return 6
-        if state.snake.HeadDirection.X == 1 and state.snake.HeadDirection.Y == 0:
+        if snake.HeadDirection.X == 1 and snake.HeadDirection.Y == 0:
             return 3
-        if state.snake.HeadDirection.X == -1 and state.snake.HeadDirection.Y == 0:
+        if snake.HeadDirection.X == -1 and snake.HeadDirection.Y == 0:
             return 9
+
+    def UpdateBody(self, body: list, currentHead):
+        # We have taken a single path here thus updating body
+        for i, _ in enumerate(body):
+            if i == len(body) - 1:
+                # This fragment is right behind the snake
+                body[i] = currentHead
+            else:
+                # Updating the rest of the body
+                body[i] = body[i + 1]
 
 
 class AgentSnake(Agent):
@@ -128,13 +139,16 @@ class AStarSearch(Agent):
         goal = (state.FoodPosition.X, state.FoodPosition.Y)
 
         # Fetching last move: to stop the snake from turning 360°
-        previousMove = self.GetPreviousMove(state)
+        previousMove = Agent.GetPreviousMove(state.snake)
 
         plan = []
-        body = [(BodyFragment.X, BodyFragment.Y) for BodyFragment in state.snake.Body]
+        body = [(BodyFragment.X, BodyFragment.Y)
+                for BodyFragment in state.snake.Body]
         visited = set()
         heap = heapdict()
-        heap[source] = (0, 0, body, plan)  # TotalCost + SourceCost + Body + Moves
+
+        # TotalCost + SourceCost + Body + Moves
+        heap[source] = (0, 0, body, plan)
 
         while heap:
             node, data = heap.popitem()
@@ -148,31 +162,24 @@ class AStarSearch(Agent):
                 break
 
             # We have taken a single path here thus updating body
-            for i, _ in enumerate(body):
-                if i == len(body) - 1:
-                    # This fragment is right behind the snake
-                    body[i] = node
-                else:
-                    # Updating the rest of the body
-                    body[i] = body[i + 1]
+            self.UpdateBody(body, node)
 
             if node != source:
                 # Updating previous move to avoid foul move
                 previousMove = currentPlan[-1]
 
             Moves = self.GenerateMoves(
-                state, node, visited, previousMove)
+                state, node, (), previousMove)
 
             for move, moveCoordinate in Moves.items():
                 moveSourceCost = sourceCost + 1
                 moveHeuristic = abs(moveCoordinate[0] - goal[0]) + \
                     abs(moveCoordinate[1] - goal[1])
-                
+
                 # Dealing heuristics if we hit the snake body
                 if moveCoordinate in body:
                     depthFactor = state.maze.HEIGHT * state.maze.WIDTH
                     moveHeuristic += depthFactor
-                    # moveHeuristic = 10^20
 
                 currentMoveCost = moveSourceCost + moveHeuristic
                 previousMoveCost = heap.get(
@@ -182,7 +189,6 @@ class AStarSearch(Agent):
                     heap[moveCoordinate] = (
                         currentMoveCost, moveSourceCost, [*body], [*currentPlan, move])
 
-        print(plan)
         return plan
 
 
@@ -193,8 +199,10 @@ class GreedyBestFirstSearch(Agent):
 
         plan = []
         visited = set()
-        queue = [(abs(source[0] - goal[0]) + abs(source[1] - goal[1]), source, plan)]  # Heuristic + Node + Plan
-        previousMove = self.GetPreviousMove(state)
+        # Heuristic + Node + Plan
+        queue = [(abs(source[0] - goal[0]) +
+                  abs(source[1] - goal[1]), source, plan)]
+        previousMove = Agent.GetPreviousMove(state.snake)
 
         while queue:
             _, node, currentPlan = heapq.heappop(queue)
@@ -208,43 +216,58 @@ class GreedyBestFirstSearch(Agent):
                 state, node, visited, previousMove if node == source else -1)
 
             for move, moveCoordinate in Moves.items():
-                moveHeuristic = abs(moveCoordinate[0] - goal[0]) + abs(moveCoordinate[1] - goal[1])
-                heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*currentPlan, move]))
+                moveHeuristic = abs(
+                    moveCoordinate[0] - goal[0]) + abs(moveCoordinate[1] - goal[1])
+                heapq.heappush(
+                    queue, (moveHeuristic, moveCoordinate, [*currentPlan, move]))
 
         return plan
 
+
 class UniformCostSearch(Agent):
     def SearchSolution(self, state: ST.SnakeState):
-        source = state.snake.HeadPosition.getTuple()
-        goal = state.FoodPosition.getTuple()
+        source = (state.snake.HeadPosition.X, state.snake.HeadPosition.Y)
+        goal = (state.FoodPosition.X, state.FoodPosition.Y)
 
         plan = []
+        body = [(BodyFragment.X, BodyFragment.Y)
+                for BodyFragment in state.snake.Body]
         visited = set()
         cost = {source: 0}
-        queue = [(0, source, plan)]  # Cost + Node + Plan
-        previousMove = self.GetPreviousMove(state)
+        queue = [(0, source, body, plan)]  # Cost + Node + Body + Plan
+        previousMove = Agent.GetPreviousMove(state.snake)
 
         while queue:
-            currentCost, node, currentPlan = heapq.heappop(queue)
+            _, node, body, currentPlan = heapq.heappop(queue)
             visited.add(node)
 
-            if node[0] == goal[0] and node[1] == goal[1]:
+            if node == goal:
                 plan = currentPlan
+                if len(plan) == 0:
+                    print('Food at Same Location: No need to move')
                 break
 
-            if currentCost > cost[node]:
-                continue  # Skip if we have already found a cheaper path to this node
+            # We have taken a single path here thus updating body
+            self.UpdateBody(body, node)
+
+            if node != source:
+                # Updating previous move to avoid foul move
+                previousMove = currentPlan[-1]
 
             Moves = self.GenerateMoves(
-                state, node, visited, previousMove if node == source else -1)
+                state, node, visited, previousMove)
 
             for move, moveCoordinate in Moves.items():
                 moveCost = 1  # Uniform cost for each move
                 totalCost = cost[node] + moveCost
 
+                if moveCoordinate in body:
+                    # Won't consider the move which leads to the snake body
+                    continue
+
                 if moveCoordinate not in cost or totalCost < cost[moveCoordinate]:
                     cost[moveCoordinate] = totalCost
-                    heapq.heappush(queue, (totalCost, moveCoordinate, [*currentPlan, move]))
+                    heapq.heappush(
+                        queue, (totalCost, moveCoordinate, [*body], [*currentPlan, move]))
 
         return plan
-
