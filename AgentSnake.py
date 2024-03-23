@@ -1,5 +1,7 @@
 import State as ST
 from heapdict import heapdict
+from State import Vector
+import heapq
 
 
 class Agent(object):
@@ -160,19 +162,17 @@ class AStarSearch(Agent):
 
 
 class GreedyBestFirstSearch(Agent):
-    def SearchSolution(self, state):
+    def SearchSolution(self, state: ST.SnakeState):
         source = state.snake.HeadPosition.getTuple()
         goal = state.FoodPosition.getTuple()
 
         plan = []
         visited = set()
-        heap = heapdict()
-        heap[source] = (0, 0, plan)  # TotalCost + SourceCost + Moves
+        queue = [(abs(source[0] - goal[0]) + abs(source[1] - goal[1]), source, plan)]  # Heuristic + Node + Plan
         previousMove = self.GetPreviousMove(state)
 
-        while heap:
-            node, data = heap.popitem()
-            totalCost, sourceCost, currentPlan = data
+        while queue:
+            _, node, currentPlan = heapq.heappop(queue)
             visited.add(node)
 
             if node[0] == goal[0] and node[1] == goal[1]:
@@ -183,21 +183,10 @@ class GreedyBestFirstSearch(Agent):
                 state, node, visited, previousMove if node == source else -1)
 
             for move, moveCoordinate in Moves.items():
-                # moveSourceCost = sourceCost + 1
-                moveSourceCost = 0
-                moveHeuristic = abs(moveCoordinate[0] - goal[0]) + \
-                    abs(moveCoordinate[1] - goal[1])
+                moveHeuristic = abs(moveCoordinate[0] - goal[0]) + abs(moveCoordinate[1] - goal[1])
+                heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*currentPlan, move]))
 
-                currentMoveCost = moveSourceCost + moveHeuristic
-                previousMoveCost = heap.get(
-                    moveCoordinate, (float('inf'), None, None))[0]
-
-                if currentMoveCost < previousMoveCost:
-                    heap[moveCoordinate] = (
-                        currentMoveCost, moveSourceCost, [*currentPlan, move])
-
-        return plan if len(plan) != 0 else [0]
-
+        return plan
 
 class UniformCostSearch(Agent):
     def SearchSolution(self, state):
