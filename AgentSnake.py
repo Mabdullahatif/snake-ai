@@ -156,16 +156,80 @@ class AStarSearch(Agent):
                     heap[moveCoordinate] = (
                         currentMoveCost, moveSourceCost, [*currentPlan, move])
 
-        return plan
+        return plan if len(plan) != 0 else [0]
 
 
 class GreedyBestFirstSearch(Agent):
     def SearchSolution(self, state):
-        # Implement Your Algo Here
-        pass
+        source = state.snake.HeadPosition.getTuple()
+        goal = state.FoodPosition.getTuple()
+
+        plan = []
+        visited = set()
+        heap = heapdict()
+        heap[source] = (0, 0, plan)  # TotalCost + SourceCost + Moves
+        previousMove = self.GetPreviousMove(state)
+
+        while heap:
+            node, data = heap.popitem()
+            totalCost, sourceCost, currentPlan = data
+            visited.add(node)
+
+            if node[0] == goal[0] and node[1] == goal[1]:
+                plan = currentPlan
+                break
+
+            Moves = self.GenerateMoves(
+                state, node, visited, previousMove if node == source else -1)
+
+            for move, moveCoordinate in Moves.items():
+                # moveSourceCost = sourceCost + 1
+                moveSourceCost = 0
+                moveHeuristic = abs(moveCoordinate[0] - goal[0]) + \
+                    abs(moveCoordinate[1] - goal[1])
+
+                currentMoveCost = moveSourceCost + moveHeuristic
+                previousMoveCost = heap.get(
+                    moveCoordinate, (float('inf'), None, None))[0]
+
+                if currentMoveCost < previousMoveCost:
+                    heap[moveCoordinate] = (
+                        currentMoveCost, moveSourceCost, [*currentPlan, move])
+
+        return plan if len(plan) != 0 else [0]
 
 
 class UniformCostSearch(Agent):
     def SearchSolution(self, state):
-        # Implement Your Algo Here
-        pass
+        source = state.snake.HeadPosition.getTuple()
+        goal = state.FoodPosition.getTuple()
+
+        plan = []
+        visited = set()
+        heap = heapdict()
+        heap[source] = (0, 0, plan)  # TotalCost + SourceCost + Moves
+        previousMove = self.GetPreviousMove(state)
+
+        while heap:
+            node, data = heap.popitem()
+            totalCost, sourceCost, currentPlan = data
+            visited.add(node)
+
+            if node[0] == goal[0] and node[1] == goal[1]:
+                plan = currentPlan
+                break
+
+            Moves = self.GenerateMoves(
+                state, node, visited, previousMove if node == source else -1)
+
+            for move, moveCoordinate in Moves.items():
+                moveSourceCost = sourceCost + 1
+                currentMoveCost = moveSourceCost
+                previousMoveCost = heap.get(
+                    moveCoordinate, (float('inf'), None, None))[0]
+
+                if currentMoveCost < previousMoveCost:
+                    heap[moveCoordinate] = (
+                        currentMoveCost, moveSourceCost, [*currentPlan, move])
+
+        return plan if len(plan) != 0 else [0]
