@@ -36,35 +36,27 @@ class Main:
             self.View.UpdateView()
 
     def StartSnake(self):
-        if (self.State.snake.isAlive == False):
+        if(self.State.snake.isAlive == False):
             return
         PlanIsGood = True
         Message = "Game Over"
-        while (self.State.snake.isAlive and PlanIsGood):
+        while(self.State.snake.isAlive and PlanIsGood):
             ScoreBefore = self.State.snake.score
-
-            # Check if the food is at the same place where the snake is
-            # Agent won't have and need a plan if food is already with the snake
-            r = self.State.snake.HeadPosition.Y
-            c = self.State.snake.HeadPosition.X
-            if c == self.State.FoodPosition.X and r == self.State.FoodPosition.Y:
-                self.State.snake.score += 10
-                time.sleep(1/self.View.SPEED)
-                self.View.UpdateView()
-            else:
-                Plan = self.AgentSnake.SearchSolution(self.State)
-                self.ExecutePlan(Plan)
-
+            Plan = self.AgentSnake.SearchSolution(self.State)
+            self.ExecutePlan(Plan)
+			
             ScoreAfter = self.State.snake.score
-
-            if (ScoreAfter == ScoreBefore):
+			
+            if(ScoreAfter == ScoreBefore):
+                self.View.AddFood(self.State.FoodPosition)
                 PlanIsGood = False
-
+                
             self.State.generateFood()
-
+            if not self.State.snake.isAlive:
+                self.View.AddFood(self.State.FoodPosition)
             # time.sleep(1/2)
 
-        if (self.State.snake.isAlive):
+        if(self.State.snake.isAlive):
             Message = Message + "  HAS A BAD PLAN"
         else:
             Message = Message + " HAS HIT A WALL"

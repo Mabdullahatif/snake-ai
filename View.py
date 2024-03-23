@@ -39,7 +39,7 @@ class SnakeViewer:
 		x_offset = 0.08
 		return self.canvas.create_text(x_offset * self.CANVAS_WIDTH, 0.05 * self.CANVAS_HEIGHT, text=('Score : ' + str(0)), anchor=tkinter.NW, font=("Helvetica", 18, 'bold'), fill=color)
 		
-	def AddSnake(self, snake):
+	def AddSnake(self, snake: st.Snake):
 		x0 = snake.HeadPosition.X*self.UnitSize
 		y0 = snake.HeadPosition.Y*self.UnitSize
 		
@@ -53,7 +53,19 @@ class SnakeViewer:
 			W = W + 3
 		else:
 			H = H + 3
-		self.canvas.create_oval(x0, y0, W, H, fill=snake.Color, tags='snake')
+		self.canvas.create_oval(x0, y0, W, H, fill='red', tags='snake')
+
+		self.canvas.delete("snake-body")
+
+		# Adding Snake Body
+		for BodyFragment in snake.Body:
+			x0 = BodyFragment.X*self.UnitSize
+			y0 = BodyFragment.Y*self.UnitSize
+
+			W = x0 + self.UnitSize
+			H = y0 + self.UnitSize
+
+			self.canvas.create_oval(x0, y0, W, H, fill=snake.Color, tags='snake-body')
 	
 	def AddFood(self, food):
 		x0 = food.X*self.UnitSize

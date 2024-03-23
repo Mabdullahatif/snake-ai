@@ -37,20 +37,20 @@ class Agent(object):
 
         return {move: self._GetMoveCoordinates(source, move) for move in moves if self.IsValidMove(self._GetMoveCoordinates(source, move), state, visited)}
 
-    def IsValidMove(self, moveCoordinate, state, visited: set):
+    def IsValidMove(self, moveCoordinate, state: ST.SnakeState, visited: set):
         # Checking if the move was already visited before
         if moveCoordinate in visited:
             return False
 
+        col, row = moveCoordinate
         # Checking if the move is within the maze
-        if moveCoordinate[0] < 0 or moveCoordinate[0] >= state.maze.WIDTH:
+        if col < 0 or col >= state.maze.WIDTH:
             return False
 
-        if moveCoordinate[1] < 0 or moveCoordinate[1] >= state.maze.HEIGHT:
+        if row < 0 or row >= state.maze.HEIGHT:
             return False
 
         # Checking if the move does not lead to a wall
-        col, row = moveCoordinate
         if state.maze.MAP[row][col] == -1:
             return False
 
@@ -124,41 +124,66 @@ class AgentSnake(Agent):
 
 class AStarSearch(Agent):
     def SearchSolution(self, state: ST.SnakeState):
-        source = state.snake.HeadPosition.getTuple()
-        goal = state.FoodPosition.getTuple()
+        source = (state.snake.HeadPosition.X, state.snake.HeadPosition.Y)
+        goal = (state.FoodPosition.X, state.FoodPosition.Y)
+
+        # Fetching last move: to stop the snake from turning 360°
+        previousMove = self.GetPreviousMove(state)
 
         plan = []
+        body = [(BodyFragment.X, BodyFragment.Y) for BodyFragment in state.snake.Body]
         visited = set()
         heap = heapdict()
-        heap[source] = (0, 0, plan)  # TotalCost + SourceCost + Moves
-        previousMove = self.GetPreviousMove(state)
+        heap[source] = (0, 0, body, plan)  # TotalCost + SourceCost + Body + Moves
 
         while heap:
             node, data = heap.popitem()
-            totalCost, sourceCost, currentPlan = data
+            _, sourceCost, body, currentPlan = data
             visited.add(node)
 
-            if node[0] == goal[0] and node[1] == goal[1]:
+            if node == goal:
                 plan = currentPlan
+                if len(plan) == 0:
+                    print('Food at Same Location: No need to move')
                 break
 
+            # We have taken a single path here thus updating body
+            for i, _ in enumerate(body):
+                if i == len(body) - 1:
+                    # This fragment is right behind the snake
+                    body[i] = node
+                else:
+                    # Updating the rest of the body
+                    body[i] = body[i + 1]
+
+            if node != source:
+                # Updating previous move to avoid foul move
+                previousMove = currentPlan[-1]
+
             Moves = self.GenerateMoves(
-                state, node, visited, previousMove if node == source else -1)
+                state, node, visited, previousMove)
 
             for move, moveCoordinate in Moves.items():
                 moveSourceCost = sourceCost + 1
                 moveHeuristic = abs(moveCoordinate[0] - goal[0]) + \
                     abs(moveCoordinate[1] - goal[1])
+                
+                # Dealing heuristics if we hit the snake body
+                if moveCoordinate in body:
+                    depthFactor = state.maze.HEIGHT * state.maze.WIDTH
+                    moveHeuristic += depthFactor
+                    # moveHeuristic = 10^20
 
                 currentMoveCost = moveSourceCost + moveHeuristic
                 previousMoveCost = heap.get(
-                    moveCoordinate, (float('inf'), None, None))[0]
+                    moveCoordinate, (float('inf'), None))[0]
 
                 if currentMoveCost < previousMoveCost:
                     heap[moveCoordinate] = (
-                        currentMoveCost, moveSourceCost, [*currentPlan, move])
+                        currentMoveCost, moveSourceCost, [*body], [*currentPlan, move])
 
-        return plan if len(plan) != 0 else [0]
+        print(plan)
+        return plan
 
 
 class GreedyBestFirstSearch(Agent):
