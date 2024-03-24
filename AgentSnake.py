@@ -202,7 +202,7 @@ class GreedyBestFirstSearch(Agent):
         body = [(BodyFragment.X, BodyFragment.Y)
                 for BodyFragment in state.snake.Body]
         visited = set()
-        queue = [(self.heuristic(state, source, goal), source, body, plan)]  # Heuristic + Node + Body + Plan
+        queue = [(self.heuristic(source, goal), source, body, plan)]  # Heuristic + Node + Body + Plan
         # Fetching last move: to stop the snake from turning 360°
         previousMove = Agent.GetPreviousMove(state.snake)
 
@@ -227,7 +227,7 @@ class GreedyBestFirstSearch(Agent):
                 state, node, visited, previousMove if node == source else -1)
 
             for move, moveCoordinate in Moves.items():
-                moveHeuristic = self.heuristic(state, moveCoordinate, goal)
+                moveHeuristic = self.heuristic(moveCoordinate, goal)
                 heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*body],[*currentPlan, move]))
                 if moveCoordinate in body:
                     # Won't consider the move which leads to the snake body
@@ -235,24 +235,8 @@ class GreedyBestFirstSearch(Agent):
 
         return plan
 
-    def heuristic(self, state, start, goal):
-        maze = state.maze.MAP
-        visited = set()
-        queue = deque([(start, 0)])
-        visited.add(start)
-
-        while queue:
-            node, distance = queue.popleft()
-
-            if node == goal:
-                return distance
-
-            for move, moveCoordinate in self.GenerateMoves(state, node, visited, -1).items():
-                visited.add(moveCoordinate)
-                if maze[moveCoordinate[1]][moveCoordinate[0]] != -1:
-                    queue.append((moveCoordinate, distance + 1))
-
-        return float('inf')
+    def heuristic(self, start, goal):
+        return abs(start[0]-goal[0])+abs(start[1]-goal[1])
 
 class UniformCostSearch(Agent):
     def SearchSolution(self, state: ST.SnakeState):
