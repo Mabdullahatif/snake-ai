@@ -1,7 +1,7 @@
+import sys
 import threading
 import State as ST
 import AgentSnake as AS
-import tkinter
 import time
 import View as V
 
@@ -68,6 +68,7 @@ class Main:
     def Play(self):
         thread = threading.Thread(target=self.StartSnake)
         thread.start()
+        self.View.top.mainloop()
         return thread
 
 
