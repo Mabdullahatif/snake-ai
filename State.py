@@ -16,7 +16,8 @@ You are encourged to create a multi-thread application that uses multiple instan
 
 import random
 
-random.seed(456)
+# Initialising a Random Seed to efficiently compare algorithms
+random.seed('AI')
 
 class Const:
     UNIT_SIZE = 10

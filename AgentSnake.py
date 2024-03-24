@@ -287,6 +287,9 @@ class UniformCostSearch(Agent):
 
                 if moveCoordinate in body:
                     # Won't consider the move which leads to the snake body
+                    plan = [*currentPlan, move]
+                    # Plan will be used if cannot construct a path to the goal
+                    # This would happen if the snake's body blocks itself
                     continue
 
                 if moveCoordinate not in cost or totalCost < cost[moveCoordinate]:

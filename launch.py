@@ -4,9 +4,9 @@ import subprocess
 def main():
     # List of commands to run each script
     commands = [
-        ['A*', 'green', 'hurdlesMaze.txt', 'A*'],
-        ['GBFS', 'blue', 'hurdlesMaze.txt', 'GBFS'],
-        ['UCS', 'pink', 'hurdlesMaze.txt', 'UCS']
+        ['A*', 'green', 'Maps/hurdlesMaze.txt', 'A*'],
+        ['GBFS', 'blue', 'Maps/hurdlesMaze.txt', 'GBFS'],
+        ['UCS', 'pink', 'Maps/hurdlesMaze.txt', 'UCS']
     ]
 
     target = 'main.py'
