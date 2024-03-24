@@ -67,6 +67,9 @@ class Snake:
         
         previousHeadPosition = Vector(self.HeadPosition.X, self.HeadPosition.Y)
 
+        # Moving the head
+        self.HeadPosition.Add(self.HeadDirection)
+
         # Moving the body
         for i, _ in enumerate(self.Body):
             if i == len(self.Body) - 1:
@@ -75,9 +78,6 @@ class Snake:
             else:
                 # Updating the rest of the body
                 self.Body[i] = self.Body[i + 1]
-
-        # Moving the head
-        self.HeadPosition.Add(self.HeadDirection)
 
         r = self.HeadPosition.Y
         c = self.HeadPosition.X
@@ -97,7 +97,7 @@ class Snake:
         
         if (c == State.FoodPosition.X and r == State.FoodPosition.Y):
             BodyFragment = Vector(self.HeadPosition.X, self.HeadPosition.Y)
-            self.Body.insert(0, BodyFragment)
+            self.Body.append(BodyFragment)
             self.score = self.score + 10
 
 
