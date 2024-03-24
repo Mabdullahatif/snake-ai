@@ -54,6 +54,8 @@ class Main:
             self.State.generateFood()
             if not self.State.snake.isAlive:
                 self.View.AddFood(self.State.FoodPosition)
+
+            self.View.AddFood(self.State.FoodPosition)
             # time.sleep(1/2)
 
         if (self.State.snake.isAlive):
@@ -89,13 +91,13 @@ def runGameAgents(agents: tuple):
 
 if __name__ == '__main__':
     runGameAgents(agents=(
-        # A Star Search
-        deployAgent(state=ST.SnakeState('green', 10, 10, 0, 1, "hurdlesMaze.txt"),
-                    instance=AS.AStarSearch(), windowTitle='A* Search'),
+        # # A Star Search
+        # deployAgent(state=ST.SnakeState('green', 10, 10, 0, 1, "hurdlesMaze.txt"),
+        #             instance=AS.AStarSearch(), windowTitle='A* Search'),
 
-        # # Greedy Best First Search
-        # deployAgent(state=ST.SnakeState('blue', 10, 10, 0, 1, "hurdlesMaze.txt"),
-        #           instance=AS.GreedyBestFirstSearch(), windowTitle='GBFS Search'),
+        # Greedy Best First Search
+        deployAgent(state=ST.SnakeState('blue', 10, 10, 0, 1, "hurdlesMaze.txt"),
+                  instance=AS.GreedyBestFirstSearch(), windowTitle='GBFS Search'),
 
         # # Unifrom Cost Search
         # deployAgent(state=ST.SnakeState('pink', 10, 10, 0, 1, "hurdlesMaze.txt"),

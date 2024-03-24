@@ -78,6 +78,9 @@ class Agent(object):
                 # Updating the rest of the body
                 body[i] = body[i + 1]
 
+    def ManhattanHeuristic(self, start, goal):
+        return abs(start[0]-goal[0])+abs(start[1]-goal[1])
+
 
 class AgentSnake(Agent):
     def SearchSolution(self, state):
@@ -149,7 +152,7 @@ class AStarSearch(Agent):
         heap = heapdict()
 
         # TotalCost + SourceCost + Body + Moves
-        heap[source] = (0, 0, body, plan)
+        heap[source] = (self.ManhattanHeuristic(source, goal), 0, body, plan)
 
         while heap:
             node, data = heap.popitem()
@@ -174,8 +177,7 @@ class AStarSearch(Agent):
 
             for move, moveCoordinate in Moves.items():
                 moveSourceCost = sourceCost + 1
-                moveHeuristic = abs(moveCoordinate[0] - goal[0]) + \
-                    abs(moveCoordinate[1] - goal[1])
+                moveHeuristic = self.ManhattanHeuristic(moveCoordinate, goal)
 
                 # Dealing heuristics if we hit the snake body
                 if moveCoordinate in body:
@@ -198,16 +200,22 @@ class GreedyBestFirstSearch(Agent):
         source = (state.snake.HeadPosition.X, state.snake.HeadPosition.Y)
         goal = (state.FoodPosition.X, state.FoodPosition.Y)
 
+        # Fetching last move: to stop the snake from turning 360°
+        previousMove = Agent.GetPreviousMove(state.snake)
+
         plan = []
         body = [(BodyFragment.X, BodyFragment.Y)
                 for BodyFragment in state.snake.Body]
         visited = set()
-        queue = [(self.heuristic(state, source, goal), source, body, plan)]  # Heuristic + Node + Body + Plan
-        # Fetching last move: to stop the snake from turning 360°
-        previousMove = Agent.GetPreviousMove(state.snake)
+        heap = heapdict()
 
-        while queue:
-            _, node, body, currentPlan = heapq.heappop(queue)
+        # Heuristic + Body + Plan
+        heap[source] = (self.ManhattanHeuristic(
+            source, goal), body, plan)
+
+        while heap:
+            node, data = heap.popitem()
+            _, body, currentPlan = data
             visited.add(node)
 
             if node == goal:
@@ -224,35 +232,21 @@ class GreedyBestFirstSearch(Agent):
                 previousMove = currentPlan[-1]
 
             Moves = self.GenerateMoves(
-                state, node, visited, previousMove if node == source else -1)
+                state, node, visited, previousMove)
 
             for move, moveCoordinate in Moves.items():
-                moveHeuristic = self.heuristic(state, moveCoordinate, goal)
-                heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*body],[*currentPlan, move]))
+                moveHeuristic = self.ManhattanHeuristic(moveCoordinate, goal)
+
+                # Dealing heuristics if we hit the snake body
                 if moveCoordinate in body:
-                    # Won't consider the move which leads to the snake body
-                    continue
+                    depthFactor = state.maze.HEIGHT * state.maze.WIDTH
+                    moveHeuristic += depthFactor
+
+                heap[moveCoordinate] = (
+                    moveHeuristic, [*body], [*currentPlan, move])
 
         return plan
 
-    def heuristic(self, state, start, goal):
-        maze = state.maze.MAP
-        visited = set()
-        queue = deque([(start, 0)])
-        visited.add(start)
-
-        while queue:
-            node, distance = queue.popleft()
-
-            if node == goal:
-                return distance
-
-            for move, moveCoordinate in self.GenerateMoves(state, node, visited, -1).items():
-                visited.add(moveCoordinate)
-                if maze[moveCoordinate[1]][moveCoordinate[0]] != -1:
-                    queue.append((moveCoordinate, distance + 1))
-
-        return float('inf')
 
 class UniformCostSearch(Agent):
     def SearchSolution(self, state: ST.SnakeState):
