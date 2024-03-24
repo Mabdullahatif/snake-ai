@@ -232,11 +232,9 @@ class GreedyBestFirstSearch(Agent):
                 if moveCoordinate in body:
                     depthFactor = state.maze.HEIGHT * state.maze.WIDTH
                     moveHeuristic += depthFactor
-                    
-                heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*body],[*currentPlan, move]))
-                if moveCoordinate in body:
-                    # Won't consider the move which leads to the snake body
                     continue
+                
+                heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*body],[*currentPlan, move]))
 
         return plan
 
