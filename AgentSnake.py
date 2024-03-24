@@ -228,6 +228,11 @@ class GreedyBestFirstSearch(Agent):
 
             for move, moveCoordinate in Moves.items():
                 moveHeuristic = self.heuristic(moveCoordinate, goal)
+                # Dealing heuristics if we hit the snake body
+                if moveCoordinate in body:
+                    depthFactor = state.maze.HEIGHT * state.maze.WIDTH
+                    moveHeuristic += depthFactor
+                    
                 heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*body],[*currentPlan, move]))
                 if moveCoordinate in body:
                     # Won't consider the move which leads to the snake body
