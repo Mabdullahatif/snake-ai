@@ -16,6 +16,7 @@ You are encourged to create a multi-thread application that uses multiple instan
 
 import random
 
+random.seed(456)
 
 class Const:
     UNIT_SIZE = 10

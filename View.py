@@ -15,7 +15,7 @@ class SnakeViewer:
 
         self.SPEED = SPEED  # Greater value here increases the speed of motion of the snakes
         self.state = state
-        self.top = tkinter.Toplevel()
+        self.top = tkinter.Tk()
         # self.top.state("zoomed")
         self.UnitSize = UnitSize
         # Width of drawing canvas in pixels

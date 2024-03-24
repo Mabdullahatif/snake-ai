@@ -71,35 +71,30 @@ class Main:
         return thread
 
 
-def deployAgent(state, instance, windowTitle):
-    return {'state': state, 'instance': instance, 'windowTitle': windowTitle}
-
-
-def runGameAgents(agents: tuple):
-    root = tkinter.Tk()
-    root.title('Snake Search with Multiple Agents')
-    root.withdraw()  # Hiding the root window
-
-    # Fueling and running each game agent
-    for agent in agents:
-        engine = Main(agent['state'], agent['instance'], agent['windowTitle'])
-        engine.Play()
-
-    # Running the Main Tkinter Loop
-    root.mainloop()
-
-
 if __name__ == '__main__':
-    runGameAgents(agents=(
-        # # A Star Search
-        deployAgent(state=ST.SnakeState('green', 10, 10, 0, 1, "hurdlesMaze.txt"),
-                    instance=AS.AStarSearch(), windowTitle='A* Search'),
+    arguments = sys.argv
+    if len(arguments) < 5:
+        print("Usage: python main.py <A*/GBFS/UCS> <COLOR> <MAZE.TXT> <WINDOW TITLE>")
+        sys.exit(1)
 
-        # Greedy Best First Search
-        deployAgent(state=ST.SnakeState('blue', 10, 10, 0, 1, "hurdlesMaze.txt"),
-                  instance=AS.GreedyBestFirstSearch(), windowTitle='GBFS Search'),
+    algo = arguments[1]
+    color = arguments[2]
+    maze = arguments[3]
+    title = arguments[4]
 
-        # # Unifrom Cost Search
-        deployAgent(state=ST.SnakeState('pink', 10, 10, 0, 1, "hurdlesMaze.txt"),
-                     instance=AS.UniformCostSearch(), windowTitle='UCS Search'),
-    ))
+    instance = AS.AStarSearch()
+    if algo.lower() == 'GBFS'.lower():
+        instance = AS.GreedyBestFirstSearch()
+
+    if algo.lower() == 'UCS'.lower():
+        instance = AS.UniformCostSearch()
+
+    # A Star Search
+    agent = {
+        'state': ST.SnakeState(color, 10, 10, 0, 1, maze),
+        'instance': instance,
+        'windowTitle': title
+    }
+
+    engine = Main(agent['state'], agent['instance'], agent['windowTitle'])
+    engine.Play()
