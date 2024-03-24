@@ -1,3 +1,4 @@
+from collections import deque
 import State as ST
 from heapdict import heapdict
 from State import Vector
@@ -194,35 +195,64 @@ class AStarSearch(Agent):
 
 class GreedyBestFirstSearch(Agent):
     def SearchSolution(self, state: ST.SnakeState):
-        source = state.snake.HeadPosition.getTuple()
-        goal = state.FoodPosition.getTuple()
+        source = (state.snake.HeadPosition.X, state.snake.HeadPosition.Y)
+        goal = (state.FoodPosition.X, state.FoodPosition.Y)
 
         plan = []
+        body = [(BodyFragment.X, BodyFragment.Y)
+                for BodyFragment in state.snake.Body]
         visited = set()
-        # Heuristic + Node + Plan
-        queue = [(abs(source[0] - goal[0]) +
-                  abs(source[1] - goal[1]), source, plan)]
+        queue = [(self.heuristic(state, source, goal), source, body, plan)]  # Heuristic + Node + Body + Plan
+        # Fetching last move: to stop the snake from turning 360°
         previousMove = Agent.GetPreviousMove(state.snake)
 
         while queue:
-            _, node, currentPlan = heapq.heappop(queue)
+            _, node, body, currentPlan = heapq.heappop(queue)
             visited.add(node)
 
-            if node[0] == goal[0] and node[1] == goal[1]:
+            if node == goal:
                 plan = currentPlan
+                if len(plan) == 0:
+                    print('Food at Same Location: No need to move')
                 break
+
+            # We have taken a single path here thus updating body
+            self.UpdateBody(body, node)
+
+            if node != source:
+                # Updating previous move to avoid foul move
+                previousMove = currentPlan[-1]
 
             Moves = self.GenerateMoves(
                 state, node, visited, previousMove if node == source else -1)
 
             for move, moveCoordinate in Moves.items():
-                moveHeuristic = abs(
-                    moveCoordinate[0] - goal[0]) + abs(moveCoordinate[1] - goal[1])
-                heapq.heappush(
-                    queue, (moveHeuristic, moveCoordinate, [*currentPlan, move]))
+                moveHeuristic = self.heuristic(state, moveCoordinate, goal)
+                heapq.heappush(queue,(moveHeuristic, moveCoordinate, [*body],[*currentPlan, move]))
+                if moveCoordinate in body:
+                    # Won't consider the move which leads to the snake body
+                    continue
 
         return plan
 
+    def heuristic(self, state, start, goal):
+        maze = state.maze.MAP
+        visited = set()
+        queue = deque([(start, 0)])
+        visited.add(start)
+
+        while queue:
+            node, distance = queue.popleft()
+
+            if node == goal:
+                return distance
+
+            for move, moveCoordinate in self.GenerateMoves(state, node, visited, -1).items():
+                visited.add(moveCoordinate)
+                if maze[moveCoordinate[1]][moveCoordinate[0]] != -1:
+                    queue.append((moveCoordinate, distance + 1))
+
+        return float('inf')
 
 class UniformCostSearch(Agent):
     def SearchSolution(self, state: ST.SnakeState):
