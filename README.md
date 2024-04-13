@@ -1,9 +1,6 @@
 # Snake Chaser Game using AI Search Algorithms
 
-https://github.com/avcton/snake-ai/assets/67834876/1a53b3d1-b869-4806-a04a-c3875b0abccf
-
 ![A_Star_Trailer](https://github.com/avcton/snake-ai/assets/67834876/f3fe74f6-b1db-4e22-8470-3ffa8bdec4a4)
-
 
 # Outline
 1. [Search Algorithms Implemented](#search-algorithms-implemented)
