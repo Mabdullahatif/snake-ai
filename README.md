@@ -84,7 +84,7 @@ Proper Documentation and sample trailer videos available in Documentation Folder
 | GBFS      | 7:34.10               | 91           | 2nd            |
 | UCS       | 3:36.17               | 58           | 3rd            |
 
-## Conclusion
+# Conclusion
 To sum up all the experiments, we can observe the behavior of each search algorithm by some variables.
 
 - **Time:** A* Algorithm worked well among other two algorithms in No hurdle maze, in small grid and also in standard maze too. However GBFS also worked fine in no hurdle and in small grid but it took more time in standard grid than other two algorithms. UCS performed better than GBFS in standard grid and took less time to reach the target score.
