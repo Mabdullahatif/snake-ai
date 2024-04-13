@@ -1,5 +1,10 @@
 # Snake Chaser Game using AI Search Algorithms
 
+https://github.com/avcton/snake-ai/assets/67834876/1a53b3d1-b869-4806-a04a-c3875b0abccf
+
+![A_Star_Trailer](https://github.com/avcton/snake-ai/assets/67834876/f3fe74f6-b1db-4e22-8470-3ffa8bdec4a4)
+
+
 # Outline
 1. [Search Algorithms Implemented](#search-algorithms-implemented)
 2. [Additional Integerated Features](#additional-integerated-features)
@@ -14,11 +19,11 @@
 - **Implementation Details:** Uses a priority queue based on the sum of the cost to reach a node and a heuristic estimate to prioritize node expansion. Utilizes the Manhattan distance as the heuristic function to estimate the cost from a node to the goal.
 - **Working:** Begins with the source node and explores nodes with the lowest estimated total cost first. Expands nodes by generating possible moves, evaluating their costs, and updating the priority queue accordingly. Continues until the goal node is reached.
 
-## Greedy Best-First Search:
+## Greedy Best-First Search (GBFS):
 - **Implementation Details:** Also employs a priority queue but prioritizes nodes solely based on their heuristic values.
 - **Working:** Starts from the source node and expands nodes with the lowest heuristic values, aiming to move closer to the goal quickly. Expands nodes by evaluating potential moves, updating the priority queue based on their heuristic values. Stops when the goal node is reached or no more nodes are left to explore.
 
-## Uniform Cost Search:
+## Uniform Cost Search (UCS):
 - **Implementation Details:** Utilizes a priority queue based solely on the actual path cost from the initial state to prioritize node expansion.
 - **Working:** Begins with the source node and expands nodes based on their path costs from the initial state. Considers all possible moves from each node, evaluating their costs and updating the priority queue accordingly. Continues until the goal node is reached or no more nodes are left to explore.
 
@@ -30,9 +35,9 @@
 # Test Mazes:
 We used three different types of mazes for testing the efficiency and effectiveness of our search algorithms and we also ran the snakes for infinitely to see which runs the longest among all.
 
-1. No Hurdles Maze:
-2. Small Grid 30*30 Hurdle Maze:
-3. Standard 60*60 Hurdle Maze:
+1. No Hurdles Maze
+2. Small Grid 30*30 Hurdle Maze
+3. Standard 60*60 Hurdle Maze
 
 # Instructions to Reproduce / Run
 
@@ -41,9 +46,9 @@ Run the following command to launch all agents:
 
 ```python launch.py```
 
-Run the following command with arguments to run specific agent:
+Run the following command structure with arguments to run specific agent:
 
->python main.py <A*/GBFS/UCS> <COLOR> <MAZE.TXT> <WINDOW TITLE>
+=> *python main.py [A*/GBFS/UCS] [COLOR] [MAZE.TXT] [GAME WINDOW TITLE]*
 
 Example:
 ```python main.py A* green Maps/hurdlesMaze.txt "A* Implementation"```
