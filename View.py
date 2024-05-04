@@ -1,9 +1,5 @@
-import time
 import tkinter
-import random
 import State as st
-import AgentSnake as AG
-import threading
 
 
 class SnakeViewer:
