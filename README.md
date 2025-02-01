@@ -1,7 +1,6 @@
-## Snake Chaser Game using AI Search Algorithms
-
 > A Snake Chaser Game with body implementation, built using AI search algorithms. 
 
+<br/>
 <div align="center">
   <img src="https://github.com/avcton/snake-ai/assets/67834876/f3fe74f6-b1db-4e22-8470-3ffa8bdec4a4"/>
 </div>
